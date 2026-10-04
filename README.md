@@ -10,7 +10,7 @@ ScholarSift lets you search, visualize, organize, and export academic literature
 
 | Dashboard | Search Results | Topic Graph |
 |-----------|---------------|-------------|
-| ![Dashboard](docs/screenshots/dashboard.png) | <!-- ![Search](screenshots/search.png) --> | <!-- ![Graph](screenshots/graph.png) --> |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Search](docs/screenshots/search.png) | <!-- ![Graph](screenshots/graph.png) --> |
 
 ---
 
