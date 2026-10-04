@@ -1,0 +1,439 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030106">
+    <title>ScholarSift — Academic Research Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=JetBrains+Mono:wght@400..600&family=Playfair+Display:ital,wght@0,400..700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="galaxy-bg.css?v=4">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23030106'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='100'%3E📚%3C/text%3E%3C/svg%3E">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div id="milky-way"></div>
+    <div id="nebula">
+        <div class="nebula-1"></div>
+        <div class="nebula-2"></div>
+        <div class="nebula-3"></div>
+        <div class="nebula-4"></div>
+    </div>
+    <div id="star-field"></div>
+    <div id="dust-canvas"></div>
+    <div id="moon"></div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon" style="font-size:1.9rem;color:var(--gold)">✦</span>
+                    <span class="logo-text">Scholar<span class="logo-accent">Sift</span></span>
+                    <button id="history-btn" class="header-btn" title="Search History">🕐 History</button>
+                </h1>
+                <div class="header-right">
+                    <button id="workspace-btn" class="header-btn" title="Research Workspace">🗺️ Workspace</button>
+                    <button id="trending-btn" class="header-btn" title="Trending Papers">🔥 Trending</button>
+                    <button id="query-runner-btn" class="header-btn" title="Custom Query Runner">⚡ Query Runner</button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">☀️</button>
+                </div>
+                <p class="tagline">Your academic research database — papers, monographs &amp; critical editions</p>
+            </div>
+        </div>
+        <!-- Collections Panel -->
+        <div id="collections-panel" class="slide-down-panel hidden">
+            <div class="panel-header">
+                <span class="panel-title">📁 Saved Collections</span>
+                <button id="collections-panel-close" class="panel-close-btn">✕</button>
+            </div>
+            <!-- Full-text search input inside collections -->
+            <div class="collections-search-bar">
+                <input id="collections-search-input" class="collections-search-input" type="text" placeholder="🔍 Search saved papers, notes, full text..." />
+                <div id="collections-search-results" class="collections-search-results"></div>
+            </div>
+            <div id="collections-list" class="collections-list"></div>
+        </div>
+        <!-- Search History Panel -->
+        <div id="history-panel" class="slide-down-panel hidden">
+            <div class="panel-header">
+                <span class="panel-title">🕐 Search History</span>
+                <button id="history-panel-close" class="panel-close-btn">✕</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Trending Feed Section -->
+        <section id="trending-section" class="trending-section hidden">
+            <div class="trending-header">
+                <span class="trending-label">🔥 Trending in AI/ML/NLP</span>
+                <button id="trending-close" class="trending-close-btn">✕</button>
+            </div>
+            <div id="trending-grid" class="trending-grid"></div>
+        </section>
+
+        <!-- Custom Query Runner Panel -->
+        <section id="query-runner-section" class="query-runner-section hidden">
+            <div class="query-runner-header">
+                <span class="query-runner-label">⚡ Custom Query Runner</span>
+                <button id="query-runner-close" class="query-runner-close-btn">✕</button>
+            </div>
+            <div class="query-runner-form">
+                <div class="query-runner-row">
+                    <select id="query-runner-source" class="query-runner-select">
+                        <option value="arxiv">arXiv</option>
+                        <option value="semantic_scholar">Semantic Scholar</option>
+                        <option value="openalex">OpenAlex</option>
+                        <option value="crossref">CrossRef</option>
+                        <option value="openlibrary">Open Library</option>
+                    </select>
+                    <input id="query-runner-query" type="text" class="query-runner-input" placeholder="Raw query string..." />
+                </div>
+                <div class="query-runner-row">
+                    <label class="query-runner-label" style="font-size:0.78rem;color:var(--text-dim)">Max results:</label>
+                    <input id="query-runner-max" type="number" class="query-runner-number" value="10" min="1" max="50" />
+                    <label class="query-runner-label" style="font-size:0.78rem;color:var(--text-dim)">Sort:</label>
+                    <select id="query-runner-sort" class="query-runner-select" style="width:auto">
+                        <option value="relevance">Relevance</option>
+                        <option value="date">Date</option>
+                        <option value="citations">Citations</option>
+                    </select>
+                    <button id="query-runner-submit" class="query-runner-submit">Run Query</button>
+                </div>
+            </div>
+            <div id="query-runner-output" class="query-runner-output">
+                <div class="query-runner-placeholder">Submit a query to see raw results.</div>
+            </div>
+        </section>
+
+        <!-- Search Bar -->
+        <section class="search-section">
+            <form id="search-form" class="search-form">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">&#128269;</span>
+                    <input
+                        type="text"
+                        id="search-input"
+                        class="search-input"
+                        placeholder='Search any philosopher, scientist, theory, or topic...'
+                        autofocus
+                    />
+                    <button id="voice-search-btn" class="voice-search-btn" title="Voice search" type="button">🎤</button>
+                    <button type="submit" id="search-btn" class="search-btn">
+                        <span class="btn-text">Search</span>
+                        <span class="btn-shortcut">↵</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Timeline Section -->
+            <div id="timeline-section" class="timeline-section hidden">
+                <div class="timeline-header">
+                    <span class="timeline-label">📅 Research Timeline</span>
+                    <button id="timeline-close" class="timeline-close-btn">✕</button>
+                </div>
+                <div class="timeline-canvas-wrapper">
+                    <canvas id="timeline-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Auto-scrolling recommendation ticker -->
+            <div class="rec-section">
+                <div class="rec-header">
+                    <span class="rec-label">Try searching</span>
+                    <button id="rec-shuffle" class="rec-shuffle" title="Shuffle suggestions">🎲</button>
+                </div>
+                <div class="rec-ticker-wrapper">
+                    <div id="rec-ticker-track" class="rec-ticker-track">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner-ring"></div>
+            <p class="loading-text">Querying scholarly databases...</p>
+            <p class="loading-sub">arXiv · Semantic Scholar · CrossRef · Open Library</p>
+        </div>
+
+        <!-- AI Overview -->
+        <div id="ai-overview" class="ai-overview hidden">
+            <div class="ai-overview-header">
+                <span class="ai-overview-icon">🤖</span>
+                <span class="ai-overview-label">AI Overview</span>
+                <button id="ai-overview-close" class="ai-overview-close" title="Dismiss">✕</button>
+            </div>
+            <div id="ai-overview-content" class="ai-overview-content">
+                <div class="ai-overview-loading">Generating overview...</div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="error-message hidden">
+            <span class="error-icon">⚠️</span>
+            <span id="error-text"></span>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section hidden">
+
+            <!-- Refinement row: topics + filters -->
+            <div id="refine-bar" class="refine-bar">
+
+                <!-- Topic chips (AI-extracted) -->
+                <div id="topics-area" class="topics-area hidden">
+                    <div class="topics-heading">
+                        <span class="section-label">🔬 Refine by topic</span>
+                        <span class="topics-hint">click to narrow results</span>
+                    </div>
+                    <div id="topics-chips" class="topics-chips"></div>
+                </div>
+
+                <!-- Source quality filters -->
+                <div id="source-filters" class="source-filters hidden">
+                    <div class="section-label">📋 Source type</div>
+                    <div class="filter-chips">
+                        <button class="filter-chip active" data-filter="all">All</button>
+                        <button class="filter-chip" data-filter="paper">Papers</button>
+                        <button class="filter-chip" data-filter="book">Books</button>
+                        <button class="filter-chip" data-filter="article">Articles</button>
+                    </div>
+                </div>
+
+                <!-- Year range filter -->
+                <div id="year-filter" class="year-filter hidden">
+                    <div class="section-label">📅 Year range</div>
+                    <div class="year-chips">
+                        <button class="year-chip active" data-years="all">All time</button>
+                        <button class="year-chip" data-years="2020-2026">Last 5 years</button>
+                        <button class="year-chip" data-years="2010-2026">Since 2010</button>
+                        <button class="year-chip" data-years="2000-2026">Since 2000</button>
+                        <button class="year-chip" data-years="1900-2026">20th century+</button>
+                    </div>
+                </div>
+
+                <!-- Search within results -->
+                <input id="filter-input" class="hidden" placeholder="Filter current results..." />
+            </div>
+
+            <!-- Active filter indicator -->
+            <div id="active-filter-bar" class="active-filter-bar hidden">
+                <div class="active-filter-tags" id="active-filter-tags"></div>
+                <div class="active-filter-actions">
+                    <button id="save-filter-preset" class="save-filter-btn" title="Save current filters">💾 Save filter</button>
+                    <button id="clear-all-filters" class="clear-all-btn">Clear all ✕</button>
+                </div>
+            </div>
+
+            <!-- Saved filter presets -->
+            <div id="filter-presets-bar" class="filter-presets-bar hidden">
+                <div class="filter-presets-label">🎯 Presets:</div>
+                <div id="filter-presets-chips" class="filter-presets-chips"></div>
+            </div>
+
+            <!-- Results count + Export + Sort -->
+            <div class="results-header">
+                <div class="results-header-top">
+                    <p id="results-count" class="results-count"></p>
+                    <div class="results-header-controls">
+                        <div class="sort-controls" id="sort-controls">
+                            <span class="sort-label">Sort by:</span>
+                            <button class="sort-btn active" data-sort="relevance">Relevance</button>
+                            <button class="sort-btn" data-sort="newest">Newest</button>
+                            <button class="sort-btn" data-sort="citations">Citations</button>
+                        </div>
+                        <button id="export-all-bibtex" class="export-bibtex-btn hidden">📋 Export All BibTeX</button>
+                        <button id="export-ris-btn" class="export-ris-btn hidden">📋 Export RIS</button>
+                        <button id="export-csv-btn" class="export-csv-btn hidden">📋 Export CSV</button>
+                        <button id="export-pdf-btn" class="export-bibtex-btn hidden">📕 Export PDF</button>
+                        <button id="export-md-btn" class="export-md-btn hidden">📋 Export MD</button>
+                        <button id="topic-graph-btn" class="topic-graph-btn hidden" title="Topic Graph">🔬 Topic Graph</button>
+                        <button id="timeline-btn" class="timeline-btn hidden" title="Timeline">📅 Timeline</button>
+                        <button id="coauthor-btn" class="coauthor-btn hidden" title="Co-author Network">👥 Co-author</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div id="results-grid" class="results-grid"></div>
+
+            <!-- Co-Author Network Graph -->
+            <div id="coauthor-graph" class="coauthor-graph hidden">
+                <div class="coauthor-graph-header">
+                    <span class="coauthor-graph-title">👥 Co-author Network</span>
+                    <button id="coauthor-graph-close" class="coauthor-graph-close">✕</button>
+                </div>
+                <canvas id="coauthor-graph-canvas"></canvas>
+            </div>
+
+            <!-- AI Topic Graph -->
+            <div id="topic-graph" class="topic-graph hidden">
+                <div class="topic-graph-header">
+                    <span class="topic-graph-title">🔬 Topic Graph</span>
+                    <button id="topic-graph-close" class="topic-graph-close">✕</button>
+                </div>
+                <canvas id="topic-graph-canvas"></canvas>
+            </div>
+
+            <!-- Citation Graph -->
+            <div id="citation-graph" class="citation-graph hidden">
+                <div class="citation-graph-header">
+                    <span class="citation-graph-title">Citation Network</span>
+                    <button id="citation-graph-close" class="citation-graph-close">✕</button>
+                </div>
+                <canvas id="citation-graph-canvas"></canvas>
+            </div>
+        </section>
+            <!-- Recommended Papers Section -->
+            <div id="recommended-section" class="recommended-section hidden">
+                <div class="recommended-header">
+                    <span class="recommended-label">✨ Recommended</span>
+                </div>
+                <div id="recommended-grid" class="recommended-grid"></div>
+            </div>
+
+            <!-- Similar-to results panel -->
+            <div id="similar-section" class="similar-section hidden">
+                <div class="similar-header">
+                    <span class="similar-label">🔗 Similar to: <span id="similar-source-title"></span></span>
+                    <button id="similar-close" class="similar-close-btn">✕</button>
+                </div>
+                <div id="similar-grid" class="similar-grid"></div>
+            </div>
+        </section>
+
+        <!-- PDF Viewer Overlay (Full Canvas PDF.js + Highlights) -->
+        <div id="pdf-viewer" class="pdf-viewer-overlay hidden">
+            <div class="pdf-viewer-container">
+                <div class="pdf-viewer-header">
+                    <span id="pdf-viewer-title" class="pdf-viewer-title">Paper PDF</span>
+                    <div class="pdf-viewer-toolbar">
+                        <button id="pdf-prev-page" class="pdf-toolbar-btn" title="Previous page">◀</button>
+                        <span id="pdf-page-indicator" class="pdf-page-indicator">1 / 1</span>
+                        <button id="pdf-next-page" class="pdf-toolbar-btn" title="Next page">▶</button>
+                        <span class="pdf-toolbar-sep"></span>
+                        <button id="pdf-zoom-out" class="pdf-toolbar-btn" title="Zoom out">🔍−</button>
+                        <span id="pdf-zoom-level" class="pdf-zoom-level">100%</span>
+                        <button id="pdf-zoom-in" class="pdf-toolbar-btn" title="Zoom in">🔍+</button>
+                        <button id="pdf-fit-width" class="pdf-toolbar-btn" title="Fit to width">⊞</button>
+                    </div>
+                    <button id="pdf-viewer-close" class="pdf-viewer-close-btn" title="Close PDF viewer">✕</button>
+                </div>
+                <div class="pdf-viewer-highlights-sidebar" id="pdf-highlights-sidebar">
+                    <div class="pdf-highlights-sidebar-header">
+                        <span class="pdf-highlights-title">📌 Highlights</span>
+                        <button id="pdf-highlights-close" class="pdf-highlights-close">✕</button>
+                    </div>
+                    <div id="pdf-highlights-list" class="pdf-highlights-list">
+                        <div class="pdf-highlights-empty">No highlights yet. Select text on a page to add one.</div>
+                    </div>
+                </div>
+                <div class="pdf-viewer-body">
+                    <div id="pdf-canvas-container" class="pdf-canvas-container"></div>
+                </div>
+                <!-- Highlight popup -->
+                <div id="pdf-highlight-popup" class="pdf-highlight-popup hidden">
+                    <div class="pdf-highlight-popup-inner">
+                        <select id="pdf-highlight-color" class="pdf-highlight-color-select">
+                            <option value="#ffff00" style="background:#ffff00">Yellow</option>
+                            <option value="#00ff88" style="background:#00ff88">Green</option>
+                            <option value="#4488ff" style="background:#4488ff">Blue</option>
+                            <option value="#ff66cc" style="background:#ff66cc">Pink</option>
+                        </select>
+                        <button id="pdf-highlight-add" class="pdf-highlight-add-btn">➕ Highlight</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Panel (slides in from right) -->
+        <div id="summary-panel" class="summary-panel hidden">
+            <div class="summary-panel-header">
+                <span class="summary-panel-title">✨ AI Paper Summary</span>
+                <button id="summary-panel-close" class="summary-panel-close-btn">✕</button>
+            </div>
+            <div id="summary-panel-content" class="summary-panel-content">
+                <div class="summary-loading">Generating summary...</div>
+            </div>
+        </div>
+
+        <!-- Research Workspace / Mind Map Overlay -->
+        <div id="workspace-overlay" class="workspace-overlay hidden">
+            <div class="workspace-toolbar">
+                <span class="workspace-title">🗺️ Research Workspace</span>
+                <button id="workspace-add-text" class="workspace-btn" title="Add text note">📝 Add note</button>
+                <button id="workspace-connect-mode" class="workspace-btn" title="Connect nodes">🔗 Connect</button>
+                <button id="workspace-save" class="workspace-btn" title="Save workspace">💾 Save</button>
+                <button id="workspace-export" class="workspace-btn" title="Export as PNG">📥 Export</button>
+                <button id="workspace-clear" class="workspace-btn" title="Clear workspace">🗑️ Clear</button>
+                <button id="workspace-close" class="workspace-close-btn" title="Close workspace">✕</button>
+            </div>
+            <canvas id="workspace-canvas" class="workspace-canvas"></canvas>
+        </div>
+
+        <!-- Empty state -->
+        <section id="empty-state" class="empty-state hidden">
+            <div class="empty-graphic">
+                <div class="empty-circle">🔍</div>
+            </div>
+            <h3 class="empty-title">No scholarly results found</h3>
+            <p class="empty-desc">Try a broader search term, or check for typos and alternate spellings</p>
+            <div class="empty-suggestions">
+                <button class="empty-suggestion" data-query="philosophy">Philosophy</button>
+                <button class="empty-suggestion" data-query="physics">Physics</button>
+                <button class="empty-suggestion" data-query="psychology">Psychology</button>
+                <button class="empty-suggestion" data-query="history">History</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Chat Assistant Panel (slides in from left) -->
+    <div id="chat-assistant" class="chat-assistant hidden">
+        <div class="chat-assistant-header">
+            <span class="chat-assistant-icon">🤖</span>
+            <span class="chat-assistant-title">Research Assistant</span>
+            <button id="chat-assistant-close" class="chat-assistant-close-btn">✕</button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="chat-message assistant">
+                <div class="chat-bubble">Hello! I'm your research assistant. Ask me about papers, authors, or concepts from your search results.</div>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input id="chat-input" class="chat-input" type="text" placeholder="Ask about your research..." />
+            <button id="chat-send-btn" class="chat-send-btn">Send</button>
+        </div>
+    </div>
+
+    <!-- Floating Chat Toggle -->
+    <button id="chat-toggle" class="chat-toggle" title="Ask AI">💬 Ask AI</button>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <p class="footer-text">
+                    Aggregating <a href="https://arxiv.org" target="_blank">arXiv</a> · 
+                    <a href="https://www.semanticscholar.org" target="_blank">Semantic Scholar</a> · 
+                    <a href="https://www.crossref.org" target="_blank">CrossRef</a> · 
+                    <a href="https://openlibrary.org" target="_blank">Open Library</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js?v=4"></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(e => console.warn('[SW] reg:', e));
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  scholarsift:
+    build: .
+    container_name: scholarsift
+    ports:
+      - "8000:8000"
+    environment:
+      # LLM API keys (set these in .env or in your shell)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Model configuration
+      - CHAT_MODEL=${CHAT_MODEL:-deepseek/deepseek-chat}
+      - OVERVIEW_MODEL=${OVERVIEW_MODEL:-deepseek/deepseek-chat}
+      # Optional: custom OpenAI-compatible base URL
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+    volumes:
+      # Persist SQLite database outside the container
+      - scholarsift_data:/app/scholarly_app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  scholarsift_data:

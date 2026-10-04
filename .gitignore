@@ -1,0 +1,35 @@
+# ═══════ SECRETS — NEVER COMMIT ═══════
+# .env holds your API keys (OPENAI_API_KEY, OPENAI_BASE_URL, etc.)
+.env
+.env.local
+*.env
+
+# ═══════ Python build / venv ═══════
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# ═══════ Local data (user bookmarks/collections, regenerable) ═══════
+*.db
+*.sqlite
+*.sqlite3
+scholarshift.db
+
+# ═══════ Deprecated duplicate tree ═══════
+# Real code lives in scholarly_app/scholarly_app/. These old copies are dead.
+_deprecated_top_level/
+
+# ═══════ Logs / OS / editor ═══════
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
